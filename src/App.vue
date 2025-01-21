@@ -33,8 +33,11 @@ const showDirectoryPickerFn = async () => {
 </script>
 
 <template>
-  <div @click="showDirectoryPickerFn">
-    123
+  <div @click="showDirectoryPickerFn">点击选择文件夹</div>
+  <div v-if="root">
+    <div v-for="item in root.children" :key="item.name">
+      {{ item.name }}
+    </div>
   </div>
 </template>
 
