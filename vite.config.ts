@@ -27,6 +27,7 @@ export default defineConfig({
     },
   },
   plugins: [vue()],
+  base: 'watch_pic',
   server: {
     port: 6688,
   },
