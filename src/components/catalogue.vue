@@ -13,6 +13,7 @@ const data = ref<FileSystemDirectoryHandleItem[]>([])
 watch(() => props.list, (val: FileSystemDirectoryHandleItem[]) => {
   if (!val || val.length === 0) return;
   data.value = val.map(item => {
+    if (item.kind === 'file') return item;
     return {
       kind: item.kind,
       name: item.name,
@@ -34,13 +35,10 @@ const directoryFn = (item: FileSystemDirectoryHandleItem) => {
  * 阅读文件内容📃
  * @param item 文件目录项
  */
-const fileUrl= ref()
 const fileFn = async (item: FileSystemDirectoryHandleItem) => {
-  console.log('item, props.list[0]', item, props.list[0]);
   // 读取文件内容
-  const file = await props.list[0].getFile!();
-  const file1 = await item.getFile!();
-  console.log('file', file, file1);
+  const file = await item.getFile!();
+  console.log('file', file);
   let params: obj = { type: '', info: '' } as unknown as obj;
   switch (file.name.split('.')[file.name.split('.').length - 1]) {
     case 'jpg':
@@ -76,11 +74,10 @@ const showFile = (item: FileSystemDirectoryHandleItem) => {
         <div class="name">{{ item.name }}</div>
       </div>
       <div class="content" v-if="item.expanded && item.children && item.children.length > 0">
-        <Catalogue :list="props.list[index].children" :parentIndex="index" />
+        <Catalogue :list="props.list[index].children" />
       </div>
     </nav>
   </div>
-  <img :src="fileUrl" alt="">
 </template>
 
 <style lang="less" scoped>

@@ -10,6 +10,11 @@ import { showType, showInfo } from '@/store/show.ts';
   </div>
 </template>
 
-<style scoped>
-
+<style lang="less" scoped>
+.show {
+  padding-left: 30px;
+  img, video {
+    max-height: 100%;
+  }
+}
 </style>
