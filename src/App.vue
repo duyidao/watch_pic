@@ -1,36 +1,37 @@
 <script setup lang="ts">
-import Catalogue from '@comp/catalogue.vue';
-import Filter from '@comp/filter.vue';
-import Show from '@comp/show.vue';
-import { root } from '@/store/catalogue.ts';
+import { onMounted } from 'vue';
+import file from '@/store/index.ts';
+import ShowImg from '@comp/ShowImg.vue';
+
+const { imgList, showIndex, openDirectory, prevImgFn, nextImgFn } = file();
+
+const keyup = (e: KeyboardEvent) => {
+  if (!e || !e.key) return console.warn(`${e} 未知`);
+  switch (e.key) {
+    case 'ArrowRight':
+      nextImgFn();
+      break;
+    case 'ArrowLeft':
+      prevImgFn();
+      break;
+    case 'Enter':
+      prevImgFn();
+      break;
+    default:
+      break;
+  }
+}
+
+onMounted(() => {
+  window.addEventListener('keyup', keyup)
+})
 </script>
 
 <template>
-  <Filter/>
-  <main class="container">
-    <Catalogue v-if="root" :list="root"/>
-    <Show />
-  </main>
+  <button @click="openDirectory">打开文件夹</button>
+  <ShowImg :imgList="imgList" :showIndex="showIndex" />
 </template>
 
-<style lang="less" scoped>
-main.container {
-  display: flex;
-  justify-content: space-between;
-  width: 100vw;
-  height: calc(100% - 30px);
-  /* height: 100vh; */
-  padding: 20px;
+<style scoped>
 
-  :deep(> .catalogue) {
-    width: 30%;
-    height: 100%;
-    overflow-y: scroll;
-  }
-
-  :deep(.show) {
-    width: 70%;
-    height: 100%;
-  }
-}
 </style>

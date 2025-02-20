@@ -1,18 +1,7 @@
-export interface FileSystemDirectoryHandleItem {
-  kind: 'directory' | 'file';
+export interface FileItem {
   name: string;
-  expanded?: boolean;
-  children?: FileSystemDirectoryHandleItem[];
-  getFile?: () => Promise<FileSystemFileHandle>;
-}
-
-export interface FileSystemDirectoryHandleData {
-  kind: 'directory' | 'file';
-  name: string;
-  expanded?: boolean;
-  children?: FileSystemDirectoryHandleItem[];
-  keys?: () => AsyncIterableIterator<FileSystemHandle>;
-  entries?: () => AsyncIterableIterator<[string, FileSystemHandle]>;
-  values?: () => AsyncIterableIterator<FileSystemHandle>;
-  getFile?: () => Promise<FileSystemFileHandle>;
+  kind: string;
+  parentName: string;
+  file?: File; // 添加 `file` 属性的定义
+  children?: Array<FileItem>;
 }
