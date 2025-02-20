@@ -1,9 +1,14 @@
 <script setup lang="ts">
-import { onMounted } from 'vue';
+import { onMounted, watchEffect } from 'vue';
 import file from '@/store/index.ts';
 import ShowImg from '@comp/ShowImg.vue';
+import FormHeader from '@comp/FormHeader.vue';
 
-const { imgList, showIndex, openDirectory, prevImgFn, nextImgFn } = file();
+const {
+  imgList, showIndex, imgTypeSet,
+  imgType, findText,
+  prevImgFn, nextImgFn, openDirectory
+} = file();
 
 const keyup = (e: KeyboardEvent) => {
   if (!e || !e.key) return console.warn(`${e} 未知`);
@@ -21,15 +26,19 @@ const keyup = (e: KeyboardEvent) => {
       break;
   }
 }
-
+watchEffect(() => {
+  console.log('imgList', imgList.value);
+})
 onMounted(() => {
   window.addEventListener('keyup', keyup)
 })
 </script>
 
 <template>
-  <button @click="openDirectory">打开文件夹</button>
-  <ShowImg :imgList="imgList" :showIndex="showIndex" />
+  <div>
+    <FormHeader :openDirectory="openDirectory" :imgTypeSet="imgTypeSet" v-model:imgType="imgType" v-model:findText="findText"/>
+    <ShowImg :imgList="imgList" :showIndex="showIndex" />
+  </div>
 </template>
 
 <style scoped>

@@ -7,6 +7,20 @@ const whiteNameList = ['.DS_Store']; // 白名单，不显示这些文件和目�
 export default () => {
   const fileList = ref<FileItem[]>([]) // 完整目录数据
   
+  const imgTypeSet = ref<Set<string>>(new Set()) // 图片类型集合
+
+  /**
+   * 文件类型过滤器函数
+   *
+   * @param item 文件项
+   * @returns 无返回值
+   */
+  const imgTypeFilter = (item: FileItem) => {
+    let name = extractChinese(item.name)
+    if (imgTypeSet.value.has(name)) return
+    imgTypeSet.value.add(name)
+  }
+
   /**
    * 异步处理目录的函数
    *
@@ -29,6 +43,7 @@ export default () => {
       }
 
       if (directory[1].kind === 'file') {
+        imgTypeFilter(obj)
         obj!.file = await directory[1].getFile()
       }
       else {
@@ -51,14 +66,8 @@ export default () => {
   }
 
   const findText = ref<string>('jpg') // 图片标题过滤
+  const imgType = ref<string>('')
   const imgList = ref<{ name: string, parentName: string, kind: string, file?: File }[]>([]) // 全图片数组
-  const imgTypeSet = ref<Set<string>>(new Set())
-
-  const imgTypeFilter = (item: FileItem) => {
-    let name = extractChinese(item.name)
-    if (imgTypeSet.value.has(name)) return
-    imgTypeSet.value.add(name)
-  }
 
   /**
    * 过滤图片文件列表
@@ -67,21 +76,16 @@ export default () => {
    * @returns 过滤后的图片文件列表
    */
   const filterImgFn = (list = fileList.value) => {
-    if (!list.length) return [];
+    if (!list.length) return;
     for (const item of list) {
       if (item.kind === "directory") {
         filterImgFn(item.children)
       }
       else {
-        imgTypeFilter(item)
-        if (item.name.includes(findText.value)) imgList.value.push(item)
+        if (item.name.includes(findText.value) && (imgType.value === '' || extractChinese(item.name) === imgType.value)) imgList.value.push(item)
       }
     }
   }
-
-  watchEffect(() => {
-    filterImgFn()
-  })
 
   /**
    * 操作图片函数
@@ -100,9 +104,15 @@ export default () => {
     showIndex.value = Math.min(Math.max(imgList.value.length - 1, 0), showIndex.value)
   }
 
+  watchEffect(() => {
+    imgList.value = [];
+    showIndex.value = 0;
+    filterImgFn();
+  })
+
   return {
     imgList, fileList, showIndex,
-    findText,
+    findText, imgTypeSet, imgType,
     openDirectory,
     prevImgFn, nextImgFn,
   }
