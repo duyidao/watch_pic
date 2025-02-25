@@ -104,6 +104,57 @@ export default () => {
     showIndex.value = Math.min(Math.max(imgList.value.length - 1, 0), showIndex.value)
   }
 
+  const choseDirectory = ref(false) // 是否选择了目录
+  const choseIpDirectory = ref(false) // 是否选择了IP目录
+  // let handle = null;
+
+  const downloadNotDirectory = () => {
+    let a = document.createElement('a');
+    a.href = URL.createObjectURL(imgList.value[showIndex.value].file!);
+    a.download = imgList.value[showIndex.value].name;
+    document.body.appendChild(a);
+    a.click();
+    setTimeout(() => {
+      URL.revokeObjectURL(a.href);
+      document.body.removeChild(a);
+    }, 0);
+  }
+
+  // const getDownloadDir = () => {
+  //   const options = {
+  //     mode: 'readwrite',
+  //     startIn: 'downloads',
+  //   };
+  //   return (window as any).showDirectoryPicker(options);
+  // };
+  const downloadDirectory = async () => {
+    // try {
+    //   // 请求用户选择保存位置
+    //   handle = getDownloadDir();
+      
+    //   // 写入文件内容
+    //   const writable = await handle.createWritable();
+    //   await writable.write(response);
+    //   await writable.close();
+    // } catch (err) {
+    //   console.error('用户取消或发生错误:', err);
+    // }
+  }
+  /**
+   * 下载图片的函数
+   *
+   * 如果未选择目录，则调用 downloadNotDirectory 函数；
+   * 否则，调用 downloadDirectory 函数。
+   */
+  const downloadImgFn = () => {
+    if (!choseDirectory.value) {
+      downloadNotDirectory();
+    }
+    else {
+      downloadDirectory();
+    }
+  }
+
   watchEffect(() => {
     imgList.value = [];
     showIndex.value = 0;
@@ -113,7 +164,8 @@ export default () => {
   return {
     imgList, fileList, showIndex,
     findText, imgTypeSet, imgType,
+    choseDirectory, choseIpDirectory,
     openDirectory,
-    prevImgFn, nextImgFn,
+    prevImgFn, nextImgFn, downloadImgFn,
   }
 }
