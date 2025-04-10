@@ -5,6 +5,7 @@ import type { ImgInfo } from '@/types/index'
 const props = defineProps<{
   openDirectory: () => void,
   downloadImgFn: () => void,
+  clearDownloadDirFn: () => void,
   imgTypeSet: Set<string>,
   imgType: string,
   findText: string,
@@ -91,7 +92,7 @@ const changeCkeckFn = (e: Event, type: 'choseDirectory' | 'choseIpDirectory') =>
           @change="changeCkeckFn($event, 'choseIpDirectory')" />
         是否携带ip目录
       </label>
-      <button>重新选择要保存的文件夹</button>
+      <button @click="clearDownloadDirFn">重新选择要保存的文件夹</button>
       <button @click="downloadImgFn">下载图片</button>
     </div>
   </header>

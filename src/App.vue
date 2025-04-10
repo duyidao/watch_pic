@@ -8,7 +8,7 @@ const {
   imgList, showIndex, imgTypeSet,
   imgType, findText, imgInfo,
   choseDirectory, choseIpDirectory,
-  prevImgFn, nextImgFn, openDirectory, downloadImgFn,
+  prevImgFn, nextImgFn, openDirectory, downloadImgFn, clearDownloadDirFn,
 } = file();
 
 const keyup = (e: KeyboardEvent) => {
@@ -40,7 +40,8 @@ onMounted(() => {
       :imgTypeSet="imgTypeSet" :showIndex="showIndex" :imgInfo="imgInfo"
       :totalLength="imgList.length"
       :openDirectory="openDirectory"
-      :downloadImgFn="downloadImgFn"/>
+      :downloadImgFn="downloadImgFn"
+      :clearDownloadDirFn="clearDownloadDirFn"/>
     <ShowImg :src="imgInfo.src" />
   </div>
 </template>

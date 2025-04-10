@@ -1,4 +1,4 @@
-import { ref, watchEffect, computed, ComputedRef } from 'vue';
+import { ref, watch, watchEffect, computed, ComputedRef } from 'vue';
 import { extractChinese } from '@/utils/index';
 import type { FileItem, ImgInfo } from '@/types/index'
 
@@ -114,7 +114,6 @@ export default () => {
 
   const choseDirectory = ref(false) // 是否选择了目录
   const choseIpDirectory = ref(false) // 是否选择了IP目录
-  let handle = null;
 
   /**
    * 下载当前显示的图片到默认文件夹
@@ -131,6 +130,9 @@ export default () => {
     }, 0);
   }
 
+
+  const handle: any = ref(null);
+  const dir: any = ref(null);
   /**
    * 获取用户选择的下载目录路径
    *
@@ -146,13 +148,17 @@ export default () => {
   const downloadDirectory = async () => {
 
     try {
-      // 请求用户选择保存位置
-      handle = await getDownloadDir();
+      if (!handle.value) {
+        // 请求用户选择保存位置
+        handle.value = await getDownloadDir();
+      }
       
-      // 写入文件内容
-      const dir = imgType.value ? await handle.getDirectoryHandle(imgType.value, {create: true}) : handle;
-      const fileHandle = await dir.getFileHandle(imgInfo.value.name, {create: true});
-      console.log('fileHandle', fileHandle);
+      if (!dir.value) {
+        // 写入文件内容
+        dir.value = imgType.value ? await handle.value!.getDirectoryHandle(imgType.value, {create: true}) : handle.value;
+      }
+
+      const fileHandle = await dir.value!.getFileHandle(imgInfo.value.name, {create: true});
       const writable = await fileHandle.createWritable();
       const buffer = await fileAndBlobToArrayBuffer(imgInfo.value.file!);
       await writable.write(buffer);
@@ -179,6 +185,12 @@ export default () => {
     });
   }
 
+  // 清掉记忆的要保存的handle和dir，重新选择目录
+  const clearDownloadDirFn = () => {
+    handle.value = null;
+    dir.value = null;
+  }
+
   /**
    * 下载图片的函数
    *
@@ -200,11 +212,15 @@ export default () => {
     filterImgFn();
   })
 
+  watch(() => imgType.value, async (newVal) => {
+    dir.value = newVal ? await handle.value!.getDirectoryHandle(imgType.value, {create: true}) : handle.value;
+  })
+
   return {
     imgList, fileList, showIndex,
     findText, imgTypeSet, imgType, imgInfo,
     choseDirectory, choseIpDirectory,
     openDirectory,
-    prevImgFn, nextImgFn, downloadImgFn,
+    prevImgFn, nextImgFn, downloadImgFn, clearDownloadDirFn,
   }
 }
