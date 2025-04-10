@@ -1,12 +1,12 @@
 <script setup lang="ts">
-import { onMounted, computed } from 'vue';
+import { onMounted } from 'vue';
 import file from '@/store/index.ts';
 import ShowImg from '@comp/ShowImg.vue';
 import FormHeader from '@comp/FormHeader.vue';
 
 const {
   imgList, showIndex, imgTypeSet,
-  imgType, findText,
+  imgType, findText, imgInfo,
   choseDirectory, choseIpDirectory,
   prevImgFn, nextImgFn, openDirectory, downloadImgFn,
 } = file();
@@ -31,22 +31,16 @@ const keyup = (e: KeyboardEvent) => {
 onMounted(() => {
   window.addEventListener('keyup', keyup)
 })
-
-const imgInfo = computed(() => {
-  return {
-    src: imgList.value.length ? URL.createObjectURL(imgList.value[showIndex.value].file as Blob) : '',
-    name: imgList.value.length ? imgList.value[showIndex.value].name : ''
-  }
-})
 </script>
 
 <template>
   <div>
     <FormHeader
       v-model:imgType="imgType" v-model:findText="findText" v-model:choseDirectory="choseDirectory" v-model:choseIpDirectory="choseIpDirectory"
-      :imgTypeSet="imgTypeSet" :showIndex="showIndex" :imgName="imgInfo.name"
+      :imgTypeSet="imgTypeSet" :showIndex="showIndex" :imgInfo="imgInfo"
       :totalLength="imgList.length"
-      :openDirectory="openDirectory"/>
+      :openDirectory="openDirectory"
+      :downloadImgFn="downloadImgFn"/>
     <ShowImg :src="imgInfo.src" />
   </div>
 </template>

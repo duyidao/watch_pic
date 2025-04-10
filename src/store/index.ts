@@ -1,6 +1,6 @@
-import { ref, watchEffect } from 'vue';
+import { ref, watchEffect, computed, ComputedRef } from 'vue';
 import { extractChinese } from '@/utils/index';
-import type { FileItem } from '@/types/index'
+import type { FileItem, ImgInfo } from '@/types/index'
 
 const whiteNameList = ['.DS_Store']; // 白名单，不显示这些文件和目录
 
@@ -68,6 +68,14 @@ export default () => {
   const findText = ref<string>('jpg') // 图片标题过滤
   const imgType = ref<string>('')
   const imgList = ref<{ name: string, parentName: string, kind: string, file?: File }[]>([]) // 全图片数组
+  const imgInfo: ComputedRef<ImgInfo> = computed(() => {
+    return {
+      file: imgList.value?.[showIndex.value]?.file || null,
+      src: !!imgList.value.length ? URL.createObjectURL(imgList.value[showIndex.value].file as Blob) : '',
+      name: imgList.value?.[showIndex.value]?.name || '暂无图片',
+      parentName: imgList.value?.[showIndex.value]?.parentName || '暂无信息',
+    }
+  })
 
   /**
    * 过滤图片文件列表
@@ -106,8 +114,11 @@ export default () => {
 
   const choseDirectory = ref(false) // 是否选择了目录
   const choseIpDirectory = ref(false) // 是否选择了IP目录
-  // let handle = null;
+  let handle = null;
 
+  /**
+   * 下载当前显示的图片到默认文件夹
+   */
   const downloadNotDirectory = () => {
     let a = document.createElement('a');
     a.href = URL.createObjectURL(imgList.value[showIndex.value].file!);
@@ -120,26 +131,54 @@ export default () => {
     }, 0);
   }
 
-  // const getDownloadDir = () => {
-  //   const options = {
-  //     mode: 'readwrite',
-  //     startIn: 'downloads',
-  //   };
-  //   return (window as any).showDirectoryPicker(options);
-  // };
+  /**
+   * 获取用户选择的下载目录路径
+   *
+   * @returns 返回用户选择的下载目录路径的 Promise 对象
+   */
+  const getDownloadDir = () => {
+    const options = {
+      mode: 'readwrite',
+      startIn: 'downloads',
+    };
+    return (window as any).showDirectoryPicker(options);
+  };
   const downloadDirectory = async () => {
-    // try {
-    //   // 请求用户选择保存位置
-    //   handle = getDownloadDir();
+
+    try {
+      // 请求用户选择保存位置
+      handle = await getDownloadDir();
       
-    //   // 写入文件内容
-    //   const writable = await handle.createWritable();
-    //   await writable.write(response);
-    //   await writable.close();
-    // } catch (err) {
-    //   console.error('用户取消或发生错误:', err);
-    // }
+      // 写入文件内容
+      const dir = imgType.value ? await handle.getDirectoryHandle(imgType.value, {create: true}) : handle;
+      const fileHandle = await dir.getFileHandle(imgInfo.value.name, {create: true});
+      console.log('fileHandle', fileHandle);
+      const writable = await fileHandle.createWritable();
+      const buffer = await fileAndBlobToArrayBuffer(imgInfo.value.file!);
+      await writable.write(buffer);
+
+      await writable.close();
+    } catch (err) {
+      console.error('用户取消或发生错误:', err);
+    }
   }
+  function fileAndBlobToArrayBuffer(file: File) {
+    return new Promise((resolve, reject) => {
+      const reader = new FileReader();
+      let arraybuffer: ArrayBuffer;
+      reader.onload = function () {
+        arraybuffer = reader.result as ArrayBuffer;
+      };
+      reader.onerror = function (error) {
+          reject(error);
+      };
+      reader.onloadend = function () {
+        resolve(arraybuffer);
+      };
+      reader.readAsArrayBuffer(file);
+    });
+  }
+
   /**
    * 下载图片的函数
    *
@@ -163,7 +202,7 @@ export default () => {
 
   return {
     imgList, fileList, showIndex,
-    findText, imgTypeSet, imgType,
+    findText, imgTypeSet, imgType, imgInfo,
     choseDirectory, choseIpDirectory,
     openDirectory,
     prevImgFn, nextImgFn, downloadImgFn,

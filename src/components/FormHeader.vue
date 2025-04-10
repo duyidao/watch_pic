@@ -1,14 +1,16 @@
 <script setup lang="ts">
 import { computed } from 'vue';
+import type { ImgInfo } from '@/types/index'
 
 const props = defineProps<{
   openDirectory: () => void,
+  downloadImgFn: () => void,
   imgTypeSet: Set<string>,
   imgType: string,
   findText: string,
   showIndex: number,
   totalLength: number,
-  imgName: string,
+  imgInfo: ImgInfo,
   choseDirectory: boolean,
   choseIpDirectory: boolean,
 }>()
@@ -49,8 +51,11 @@ const changeCkeckFn = (e: Event, type: 'choseDirectory' | 'choseIpDirectory') =>
   <header>
     <div class="header-total">
       <span>第{{ showIndex + 1 }}张 / 共{{ totalLength }}张</span>
+      <div v-for="item in imgInfo.parentName.split(',')">
+        <span>{{ item }}</span>
+      </div>
       <span>
-        图片名称：{{ imgName }}
+        图片名称：{{ imgInfo.name }}
       </span>
     </div>
     <div class="header-tool">
@@ -87,7 +92,7 @@ const changeCkeckFn = (e: Event, type: 'choseDirectory' | 'choseIpDirectory') =>
         是否携带ip目录
       </label>
       <button>重新选择要保存的文件夹</button>
-      <button>下载图片</button>
+      <button @click="downloadImgFn">下载图片</button>
     </div>
   </header>
 </template>
