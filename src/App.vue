@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { onMounted } from 'vue';
 import file from '@/store/index.ts';
+import ipFile from '@/store/ip.ts';
 import ShowImg from '@comp/ShowImg.vue';
 import FormHeader from '@comp/FormHeader.vue';
 
@@ -10,6 +11,10 @@ const {
   choseDirectory, choseIpDirectory,
   prevImgFn, nextImgFn, openDirectory, downloadImgFn, clearDownloadDirFn,
 } = file();
+const {
+  openIPDirectory,
+} = ipFile();
+
 
 const keyup = (e: KeyboardEvent) => {
   if (!e || !e.key) return console.warn(`${e} 未知`);
@@ -41,7 +46,8 @@ onMounted(() => {
       :totalLength="imgList.length"
       :openDirectory="openDirectory"
       :downloadImgFn="downloadImgFn"
-      :clearDownloadDirFn="clearDownloadDirFn"/>
+      :clearDownloadDirFn="clearDownloadDirFn"
+      :openIPDirectory="openIPDirectory"/>
     <ShowImg :src="imgInfo.src" />
   </div>
 </template>

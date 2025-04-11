@@ -1,8 +1,10 @@
 import { ref, watch, watchEffect, computed, ComputedRef } from 'vue';
 import { extractChinese } from '@/utils/index';
+import { ipFileList } from './ip.ts';
 import type { FileItem, ImgInfo } from '@/types/index'
 
 const whiteNameList = ['.DS_Store']; // 白名单，不显示这些文件和目录
+const imgTypeList = ['.jpg', '.jpeg', '.png', '.webp']
 
 export default () => {
   const fileList = ref<FileItem[]>([]) // 完整目录数据
@@ -65,34 +67,38 @@ export default () => {
     fileList.value = await handleDirectory(directorys.entries())
   }
 
-  const findText = ref<string>('jpg') // 图片标题过滤
-  const imgType = ref<string>('')
+  const findText = ref<string>('jpg') // 图片标题过滤（jpg、名称等）
+  const imgType = ref<string>('') // 图片类型过滤（火焰烟雾、道路遗撒等）
   const imgList = ref<{ name: string, parentName: string, kind: string, file?: File }[]>([]) // 全图片数组
   const imgInfo: ComputedRef<ImgInfo> = computed(() => {
     return {
       file: imgList.value?.[showIndex.value]?.file || null,
-      src: !!imgList.value.length ? URL.createObjectURL(imgList.value[showIndex.value].file as Blob) : '',
+      src: !!imgList.value?.length ? URL.createObjectURL(imgList.value[showIndex.value].file as Blob) : '',
       name: imgList.value?.[showIndex.value]?.name || '暂无图片',
       parentName: imgList.value?.[showIndex.value]?.parentName || '暂无信息',
     }
   })
 
   /**
-   * 过滤图片文件列表
+   * 过滤出所有符合条件的的图片列表用于展示渲染
    *
    * @param list 文件列表，默认为 fileList.value
    * @returns 过滤后的图片文件列表
    */
-  const filterImgFn = (list = fileList.value) => {
-    if (!list.length) return;
+  const getFiles = (list = fileList.value, filterText = '') => {
+    if (!list.length) return [];
+
+    const data = []; // 存放符合条件的图片文件
     for (const item of list) {
       if (item.kind === "directory") {
-        filterImgFn(item.children)
+        data.push(...getFiles(item.children))
       }
       else {
-        if (item.name.includes(findText.value) && (imgType.value === '' || extractChinese(item.name) === imgType.value)) imgList.value.push(item)
+        if (item.name.includes(findText.value) && (imgType.value === '' || extractChinese(item.name) === imgType.value)) data.push(item)
       }
     }
+
+    return data
   }
 
   /**
@@ -133,6 +139,7 @@ export default () => {
 
   const handle: any = ref(null);
   const dir: any = ref(null);
+  const downloadImgList = ref([]);
   /**
    * 获取用户选择的下载目录路径
    *
@@ -198,6 +205,12 @@ export default () => {
    * 否则，调用 downloadDirectory 函数。
    */
   const downloadImgFn = () => {
+    const imgName = imgInfo.value.name.split('.')[0];
+    const imgData = imgTypeList.map(item => imgName + item);
+    console.log('imgData', imgData);
+    downloadImgList.value = getFiles(_, imgData)
+    console.log('downloadImgList.value', downloadImgList.value);
+    return
     if (!choseDirectory.value) {
       downloadNotDirectory();
     }
@@ -209,7 +222,7 @@ export default () => {
   watchEffect(() => {
     imgList.value = [];
     showIndex.value = 0;
-    filterImgFn();
+    imgList.value = getFiles();
   })
 
   watch(() => imgType.value, async (newVal) => {
