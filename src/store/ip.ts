@@ -1,11 +1,11 @@
-import { ref, watch, watchEffect, computed, ComputedRef } from 'vue';
+import { ref } from 'vue';
 
 const whiteNameList = ['.DS_Store']; // 白名单，不显示这些文件和目录
 
 export default () => {
-  const ipFileList = ref<FileItem[]>([]) // 完整ip目录数据
+  const ipFileList = ref<any[]>([]) // 完整ip目录数据
 
-  const handleIPDirectory = async (handle: any) => {
+  const handleIPDirectory: any = async (handle: any) => {
     const list = []; // 存放目录数据的数组
     for await (const directory of handle) {
       if (whiteNameList.includes(directory[0])) continue

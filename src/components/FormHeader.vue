@@ -1,5 +1,8 @@
 <script setup lang="ts">
-import { computed } from 'vue';
+import { computed, ComputedRef } from 'vue';
+import { Button as AButton, Checkbox, Input as AInput, Select as ASelect } from 'ant-design-vue';
+import type { SelectValue, DefaultOptionType } from 'ant-design-vue/es/select';
+import type { CheckboxChangeEvent } from 'ant-design-vue/es/checkbox/interface';
 import type { ImgInfo } from '@/types/index'
 
 const props = defineProps<{
@@ -19,8 +22,8 @@ const props = defineProps<{
 
 const emits = defineEmits(['update:imgType', 'update:findText', 'update:choseDirectory', 'update:choseIpDirectory']);
 
-const imgTypeOptions = computed(() => {
-  return Array.from(props.imgTypeSet);
+const imgTypeOptions: ComputedRef<DefaultOptionType[]> = computed(() => {
+  return Array.from(props.imgTypeSet).map(item => ({ value: item, label: item }));
 });
 
 /**
@@ -28,10 +31,11 @@ const imgTypeOptions = computed(() => {
  *
  * @param e 事件对象
  */
-const changeImgType = (e: Event) => {
-  const target = e.target as HTMLSelectElement;
-  emits('update:imgType', target.value);
+const changeImgType = (e: SelectValue) => {
+  console.log(e);
+  emits('update:imgType', e);
 };
+
 
 /**
  * 修改文本的函数
@@ -39,13 +43,12 @@ const changeImgType = (e: Event) => {
  * @param e 事件对象
  */
 const changeTextFn = (e: Event) => {
-  const target = e.target as HTMLInputElement;
-  emits('update:findText', target.value);
+  emits('update:findText', (e.target as HTMLInputElement).value);
 };
 
-const changeCkeckFn = (e: Event, type: 'choseDirectory' | 'choseIpDirectory') => {
-  const target = e.target as HTMLInputElement;
-  emits(`update:${type}`, target.checked);
+const changeCkeckFn = (type: 'choseDirectory' | 'choseIpDirectory', e: CheckboxChangeEvent) => {
+  console.log(type, e);
+  emits(`update:${type}`, (e.target as HTMLInputElement).checked);
 };
 </script>
 
@@ -53,64 +56,56 @@ const changeCkeckFn = (e: Event, type: 'choseDirectory' | 'choseIpDirectory') =>
   <header>
     <div class="header-total">
       <span class="img-index">第{{ showIndex + 1 }}张 / 共{{ totalLength }}张</span>
-      <span class="img-name" :text="imgInfo.name">
+      <span class="img-name"
+        :text="imgInfo.name">
         名称：{{ imgInfo.name }}
       </span>
     </div>
     <div class="header-tool">
-      <button @click="openDirectory">选取文件夹</button>
-      <span>图片格式：</span>
-      <input :value="findText"
-        type="text"
-        placeholder="请输入精确搜索的关键词"
-        @change="changeTextFn" />
+      <a-button type="primary"
+        @click="openDirectory">选取文件夹</a-button>
+      <a-input style="width: 210px"
+        :value="findText"
+        addon-before="图片格式"
+        placeholder="请输入关键词"
+        @input="changeTextFn" />
       <span>图片类型：</span>
-      <select :value="imgType"
-        name="imgType"
-        id=""
-        @change="changeImgType">
-        <option value="">全部</option>
-        <option v-for="item in imgTypeOptions"
-          :key="item"
-          :value="item">{{ item }}</option>
-      </select>
-      <button @click="openIPDirectory">关联IP</button>
-      <button @click="clearDownloadDirFn">重新指定保存路径</button>
-      <button @click="downloadImgFn">下载图片</button>
+      <a-select :value="imgType"
+        style="width: 160px"
+        :options="imgTypeOptions"
+        @change="changeImgType" />
+      <a-button @click="openIPDirectory">关联IP</a-button>
+      <a-button @click="clearDownloadDirFn">重新指定保存路径</a-button>
+      <a-button @click="downloadImgFn">下载图片</a-button>
     </div>
     <div class="header-download">
-      <label for="folder">
-        <input :value="choseDirectory"
-          type="checkbox"
-          name="folder"
-          id="folder"
-          @change="changeCkeckFn($event, 'choseDirectory')" />
-        是否下载到指定文件夹
-      </label>
-      <label for="ip">
-        <input :value="choseIpDirectory"
-          type="checkbox"
-          name="ip"
-          id="ip"
-          @change="changeCkeckFn($event, 'choseIpDirectory')" />
-        是否携带ip目录
-      </label>
+      <div class="download-chose">
+        <checkbox :value:checked="choseDirectory"
+          @change="($event) => changeCkeckFn('choseDirectory', $event)">是否保存到指定路径</checkbox>
+        <checkbox :value:checked="choseIpDirectory"
+          @change="($event) => changeCkeckFn('choseIpDirectory', $event)">是否携带ip目录</checkbox>
+      </div>
+      <div class="total">
+
+      </div>
     </div>
   </header>
 </template>
 
 <style lang="less" scoped>
 header {
-  padding: 20px;
+  padding: 12px 15px;
 
   .header-total {
     display: flex;
     align-items: center;
+    height: 25px;
     font-size: 20px;
 
     .img-index {
       position: relative;
       max-width: 180px;
+      height: 100%;
       margin-right: 10px;
       padding-right: 13px;
 
@@ -128,9 +123,13 @@ header {
 
     .img-name {
       max-width: 84%;
-      white-space: nowrap;/*禁止文本换行 */
-      overflow: hidden;/* 隐藏超出范围的内容 */
-      text-overflow: ellipsis;/* 使用省路号 */
+      height: 100%;
+      white-space: nowrap;
+      /*禁止文本换行 */
+      overflow: hidden;
+      /* 隐藏超出范围的内容 */
+      text-overflow: ellipsis;
+      /* 使用省路号 */
     }
   }
 
@@ -138,7 +137,7 @@ header {
     display: flex;
     align-items: center;
     height: 25px;
-    margin: 15px 0;
+    margin: 14px 0;
     font-size: 14px;
 
     button {
@@ -148,25 +147,30 @@ header {
       height: 100%;
     }
 
-    input {
-      min-width: 180px;
-      height: 100%;
+    :deep(.ant-input-group-wrapper) {
+      height: 25px;
       margin-right: 20px;
-      padding-left: 12px;
-      border: 1px solid #ccc;
-      font-size: 14px;
+
+      .ant-input-wrapper {
+        height: 25px;
+
+        span,
+        input {
+          height: 25px;
+        }
+      }
     }
 
-    select {
-      min-width: 180px;
+    :deep(.ant-select) {
       height: 100%;
       margin-right: 20px;
-      padding-left: 8px;
-      border: 1px solid #ccc;
-      font-size: 14px;
 
-      &:focus-visible {
-        outline: none;
+      .ant-select-selector {
+        height: 100%;
+
+        .ant-select-selection-search-input {
+          height: 100%;
+        }
       }
     }
   }
@@ -175,14 +179,12 @@ header {
     display: flex;
     align-items: center;
 
-    label {
-      margin-right: 20px;
-      font-size: 14px;
+    >div {
       display: flex;
       align-items: center;
 
-      input {
-        margin-right: 8px;
+      label {
+        margin-right: 14px;
       }
     }
   }

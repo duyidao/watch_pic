@@ -1,4 +1,6 @@
 import { defineConfig } from 'vite';
+import Components from 'unplugin-vue-components/vite';
+import { AntDesignVueResolver } from 'unplugin-vue-components/resolvers';
 import vue from '@vitejs/plugin-vue';
 import path from 'path';
 // eslint-disable-next-line no-control-regex
@@ -22,7 +24,16 @@ export default defineConfig({
             },
         },
     },
-    plugins: [vue()],
+    plugins: [
+        vue(),
+        Components({
+            resolvers: [
+                AntDesignVueResolver({
+                    importStyle: false, // css in js
+                }),
+            ],
+        }),
+    ],
     base: 'watch_pic',
     server: {
         port: 6688,
