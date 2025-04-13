@@ -59,9 +59,6 @@ const totalList = computed(() => {
     }
   });
 })
-
-console.log(totalList.value);
-
 </script>
 
 <template>

@@ -1,8 +1,8 @@
 import { ref, watch, watchEffect, computed, ComputedRef } from "vue";
 import { extractChinese } from "@/utils/index";
-// import ipFile from "@/store/ip.ts";
+import ipFile from "@/store/ip.ts";
 import type { FileItem, ImgInfo } from "@/types/index";
-import { message } from 'ant-design-vue';
+import { message } from "ant-design-vue";
 
 const whiteNameList = [".DS_Store"]; // 白名单，不显示这些文件和目录
 const imgTypeList = [".jpg", ".jpeg", ".png", ".webp", ".svg"];
@@ -12,7 +12,7 @@ export default () => {
 
   const imgTypeSet = ref<Set<string>>(new Set()); // 图片类型集合
 
-  // const { ipFileList } = ipFile();
+  const { ipFileList, findDeviceIp } = ipFile();
 
   /**
    * 文件类型过滤器函数
@@ -132,8 +132,8 @@ export default () => {
       Math.min(imgList.value.length - 1, 0),
       showIndex.value
     );
-    
-    if (showIndex.value === 0) message.info('已经是第一张图片了');
+
+    if (showIndex.value === 0) message.info("已经是第一张图片了");
   };
   // 定义一个函数，用于显示下一张图片
   const nextImgFn = () => {
@@ -144,7 +144,8 @@ export default () => {
       showIndex.value
     );
 
-    if (showIndex.value === imgList.value.length - 1) message.info('已经是最后一张图片了');
+    if (showIndex.value === imgList.value.length - 1)
+      message.info("已经是最后一张图片了");
   };
 
   const choseDirectory = ref(false); // 是否选择了目录
@@ -202,6 +203,25 @@ export default () => {
           : handle.value;
       }
 
+      const parentName =
+        imgInfo.value.parentName.split(",")[
+          imgInfo.value.parentName.split(",").length - 1
+        ];
+      if (choseIpDirectory.value) {
+        // ip文件夹
+        dir.value = await dir.value.getDirectoryHandle(parentName, {
+          create: true,
+        });
+        const deviceId = imgInfo.value.name.split("_")[1];
+        const ip = findDeviceIp(parentName, deviceId);
+        if (deviceId && ip) {
+          // deviceId-ip文件夹
+          dir.value = await dir.getDirectoryHandle(`${deviceId}-${ip}`, {
+            create: true,
+          });
+        }
+      }
+
       downloadImgList.value.forEach(async (item: any) => {
         const fileHandle = await dir.value!.getFileHandle(item.name, {
           create: true,
@@ -211,7 +231,7 @@ export default () => {
         await writable.write(buffer);
         message.success(`图片${item.name}下载成功`);
         await writable.close();
-      })
+      });
     } catch (err) {
       console.error("用户取消或发生错误:", err);
       message.success(`用户取消或发生错误:${err}`);
@@ -238,7 +258,7 @@ export default () => {
   const clearDownloadDirFn = () => {
     handle.value = null;
     dir.value = null;
-    message.info('已清空目录');
+    message.info("已清空目录");
   };
 
   /**
@@ -250,16 +270,12 @@ export default () => {
   const downloadImgFn = () => {
     const imgName = imgInfo.value.name.split(".")[0];
     downloadImgList.value = [];
-    console.log(imgTypeList);
-    
+
     const imgData = imgTypeList.map((item) => imgName + item);
     imgData.forEach((item) => {
-      console.log(item);
-      
       downloadImgList.value.push(...getFiles(undefined, item));
     });
-    console.log(imgData.values, downloadImgList.value);
-    
+
     if (!choseDirectory.value) {
       downloadNotDirectory();
     } else {
