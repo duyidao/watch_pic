@@ -1,9 +1,11 @@
 <script setup lang="ts">
-import { onMounted } from 'vue';
+import { onMounted, computed } from 'vue';
 import file from '@/store/index.ts';
 import ipFile from '@/store/ip.ts';
+import statisticsFile from '@/store/statistics.ts';
 import ShowImg from '@comp/ShowImg.vue';
 import FormHeader from '@comp/FormHeader.vue';
+import ShowModal from '@comp/ShowModal.vue';
 
 const {
   imgList, showIndex, imgTypeSet,
@@ -14,6 +16,11 @@ const {
 const {
   openIPDirectory,
 } = ipFile();
+const {
+  showModal,
+  totalData,
+  statisticsTotalFn,
+} = statisticsFile();
 
 
 const keyup = (e: KeyboardEvent) => {
@@ -36,6 +43,25 @@ const keyup = (e: KeyboardEvent) => {
 onMounted(() => {
   window.addEventListener('keyup', keyup)
 })
+
+const totalList = computed(() => {
+  return Object.keys(totalData.value).map((key) => {
+    console.log(key, totalData.value[key]);
+    return {
+      name: key,
+      total: totalData.value[key].total,
+      children: Object.keys(totalData.value[key].children).map(item => {
+        return {
+          ip: item,
+          total: totalData.value[key].children[item],
+        }
+      }).sort((a, b) => b.total - a.total)
+    }
+  });
+})
+
+console.log(totalList.value);
+
 </script>
 
 <template>
@@ -47,8 +73,10 @@ onMounted(() => {
       :openDirectory="openDirectory"
       :downloadImgFn="downloadImgFn"
       :clearDownloadDirFn="clearDownloadDirFn"
-      :openIPDirectory="openIPDirectory"/>
+      :openIPDirectory="openIPDirectory"
+      :statisticsTotalFn="statisticsTotalFn"/>
     <ShowImg :src="imgInfo.src" />
+    <ShowModal v-model:open="showModal" :data="totalList" />
   </div>
 </template>
 

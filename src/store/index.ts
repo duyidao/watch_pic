@@ -2,9 +2,10 @@ import { ref, watch, watchEffect, computed, ComputedRef } from "vue";
 import { extractChinese } from "@/utils/index";
 // import ipFile from "@/store/ip.ts";
 import type { FileItem, ImgInfo } from "@/types/index";
+import { message } from 'ant-design-vue';
 
 const whiteNameList = [".DS_Store"]; // 白名单，不显示这些文件和目录
-const imgTypeList = [".jpg", ".jpeg", ".png", ".webp"];
+const imgTypeList = [".jpg", ".jpeg", ".png", ".webp", ".svg"];
 
 export default () => {
   const fileList = ref<FileItem[]>([]); // 完整目录数据
@@ -71,11 +72,9 @@ export default () => {
     fileList.value = await handleDirectory(directorys.entries());
   };
 
-  const findText = ref<string>("jpg"); // 图片标题过滤（jpg、名称等）
+  const findText = ref<string>(""); // 图片标题过滤（jpg、名称等）
   const imgType = ref<string>(""); // 图片类型过滤（火焰烟雾、道路遗撒等）
-  const imgList = ref<
-    { name: string; parentName: string; kind: string; file?: File }[]
-  >([]); // 全图片数组
+  const imgList = ref<FileItem[]>([]); // 全图片数组
   const imgInfo: ComputedRef<ImgInfo> = computed(() => {
     return {
       file: imgList.value?.[showIndex.value]?.file || null,
@@ -133,6 +132,8 @@ export default () => {
       Math.min(imgList.value.length - 1, 0),
       showIndex.value
     );
+    
+    if (showIndex.value === 0) message.info('已经是第一张图片了');
   };
   // 定义一个函数，用于显示下一张图片
   const nextImgFn = () => {
@@ -142,6 +143,8 @@ export default () => {
       Math.max(imgList.value.length - 1, 0),
       showIndex.value
     );
+
+    if (showIndex.value === imgList.value.length - 1) message.info('已经是最后一张图片了');
   };
 
   const choseDirectory = ref(false); // 是否选择了目录
@@ -160,6 +163,7 @@ export default () => {
       a.download = item.name;
       document.body.appendChild(a);
       a.click();
+      message.success(`图片${item.name}下载成功`);
       setTimeout(() => {
         URL.revokeObjectURL(a.href);
         document.body.removeChild(a);
@@ -205,11 +209,12 @@ export default () => {
         const writable = await fileHandle.createWritable();
         const buffer = await fileAndBlobToArrayBuffer(item.file!);
         await writable.write(buffer);
-  
+        message.success(`图片${item.name}下载成功`);
         await writable.close();
       })
     } catch (err) {
       console.error("用户取消或发生错误:", err);
+      message.success(`用户取消或发生错误:${err}`);
     }
   };
   function fileAndBlobToArrayBuffer(file: File) {
@@ -233,6 +238,7 @@ export default () => {
   const clearDownloadDirFn = () => {
     handle.value = null;
     dir.value = null;
+    message.info('已清空目录');
   };
 
   /**
@@ -243,12 +249,17 @@ export default () => {
    */
   const downloadImgFn = () => {
     const imgName = imgInfo.value.name.split(".")[0];
+    downloadImgList.value = [];
+    console.log(imgTypeList);
+    
     const imgData = imgTypeList.map((item) => imgName + item);
-    console.log("imgData", imgData);
     imgData.forEach((item) => {
+      console.log(item);
+      
       downloadImgList.value.push(...getFiles(undefined, item));
     });
-    console.log("downloadImgList.value", downloadImgList.value);
+    console.log(imgData.values, downloadImgList.value);
+    
     if (!choseDirectory.value) {
       downloadNotDirectory();
     } else {
@@ -264,12 +275,8 @@ export default () => {
 
   watch(
     () => imgType.value,
-    async (newVal) => {
-      dir.value = newVal
-        ? await handle.value!.getDirectoryHandle(imgType.value, {
-            create: true,
-          })
-        : handle.value;
+    () => {
+      dir.value = null;
     }
   );
 

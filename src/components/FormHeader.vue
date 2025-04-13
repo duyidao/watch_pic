@@ -10,6 +10,7 @@ const props = defineProps<{
   downloadImgFn: () => void,
   clearDownloadDirFn: () => void,
   openIPDirectory: () => void,
+  statisticsTotalFn: () => void,
   imgTypeSet: Set<string>,
   imgType: string,
   findText: string,
@@ -86,7 +87,7 @@ const changeCkeckFn = (type: 'choseDirectory' | 'choseIpDirectory', e: CheckboxC
           @change="($event) => changeCkeckFn('choseIpDirectory', $event)">是否携带ip目录</checkbox>
       </div>
       <div class="total">
-
+        <a-button type="link" @click="statisticsTotalFn">统计结果</a-button>
       </div>
     </div>
   </header>
@@ -168,6 +169,10 @@ header {
       .ant-select-selector {
         height: 100%;
 
+        .ant-select-selection-item {
+          line-height: 1.6;
+        }
+
         .ant-select-selection-search-input {
           height: 100%;
         }
@@ -178,6 +183,7 @@ header {
   .header-download {
     display: flex;
     align-items: center;
+    justify-content: space-between;
 
     >div {
       display: flex;
