@@ -25,6 +25,7 @@ const {
 
 const keyup = (e: KeyboardEvent) => {
   if (!e || !e.key) return console.warn(`${e} 未知`);
+  if (document.activeElement?.tagName === 'INPUT') return;
   switch (e.key) {
     case 'ArrowRight':
       nextImgFn();
@@ -46,7 +47,6 @@ onMounted(() => {
 
 const totalList = computed(() => {
   return Object.keys(totalData.value).map((key) => {
-    console.log(key, totalData.value[key]);
     return {
       name: key,
       total: totalData.value[key].total,
@@ -55,7 +55,7 @@ const totalList = computed(() => {
           ip: item,
           total: totalData.value[key].children[item],
         }
-      }).sort((a, b) => b.total - a.total)
+      }).sort((a, b) => b.total - a.total).slice(0, 5),
     }
   });
 })
@@ -64,8 +64,9 @@ const totalList = computed(() => {
 <template>
   <div>
     <FormHeader
-      v-model:imgType="imgType" v-model:findText="findText" v-model:choseDirectory="choseDirectory" v-model:choseIpDirectory="choseIpDirectory"
-      :imgTypeSet="imgTypeSet" :showIndex="showIndex" :imgInfo="imgInfo"
+      v-model:imgType="imgType" v-model:findText="findText" v-model:showIndex="showIndex"
+      v-model:choseDirectory="choseDirectory" v-model:choseIpDirectory="choseIpDirectory"
+      :imgTypeSet="imgTypeSet" :imgInfo="imgInfo"
       :totalLength="imgList.length"
       :openDirectory="openDirectory"
       :downloadImgFn="downloadImgFn"

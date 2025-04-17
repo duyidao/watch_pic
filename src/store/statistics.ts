@@ -5,6 +5,7 @@ const whiteNameList = [".DS_Store"]; // 白名单，不显示这些文件和目�
 export default () => {
   const totalData = ref<any>({}); // 完整ip目录数据
   const showModal = ref<boolean>(false); // 是否显示弹窗
+  const imgSearchList = ['施工区域', '火焰烟雾', '道路遗撒', 'roi偏移', '异常停车', '道路遗撒', '占用应急车道', '交通事故', '交通拥堵'];
 
   const handleIPDirectory: any = async (
     handle: any,
@@ -14,18 +15,17 @@ export default () => {
       if (whiteNameList.includes(directory[0])) continue;
 
       if (directory[1].kind === "directory") {
-        await handleIPDirectory(directory[1].entries(), directory[0]);
-        console.log('directory', directory[0]);
-        if (!totalData.value[directory[0]]) {
+        const name = imgSearchList.includes(directory[0]) ? directory[0] : parentName;
+        await handleIPDirectory(directory[1].entries(), name);
+        if (imgSearchList.includes(directory[0]) && !totalData.value[directory[0]]) {
           totalData.value[directory[0]] = {
             total: 0,
             children: {},
           }
         }
       } else {
-        console.log('kind', directory[0]);
         const ipCameraName = `${directory[0].split("_")[0]}_${directory[0].split("_")[1]}`;
-        console.log('ipCameraName', ipCameraName);
+        if (directory[0].split('.').at(-1) !== 'jpg') continue;
         
         totalData.value[parentName] = {
           ...totalData.value[parentName],

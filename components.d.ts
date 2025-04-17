@@ -11,6 +11,5 @@ declare module 'vue' {
     FormHeader: typeof import('./src/components/FormHeader.vue')['default']
     ShowImg: typeof import('./src/components/ShowImg.vue')['default']
     ShowModal: typeof import('./src/components/ShowModal.vue')['default']
-    Test: typeof import('./src/components/test.vue')['default']
   }
 }

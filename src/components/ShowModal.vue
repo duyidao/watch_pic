@@ -23,7 +23,7 @@ const columns = [
     title: '误报类型',
     dataIndex: 'name',
     key: 'name',
-    width: '120px'
+    width: '150px'
   },
   {
     title: 'ip与相机编号',

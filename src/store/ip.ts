@@ -7,28 +7,31 @@ export default () => {
 
   const handleIPDirectory: any = async (handle: any) => {
     const list = []; // 存放目录数据的数组
-    for await (const directory of handle) {
-      if (whiteNameList.includes(directory[0])) continue;
-console.log(directory, handle);
-
-      if (directory[1].kind === "directory") {
-        const children = await handleIPDirectory(directory[1].entries())
-        console.log("children", children);
-        list.push({
-          name: directory[0],
-          children,
-        });
-      } else {
-        console.log("file", directory);
-
-        const file = await directory[1].getFile();
-        console.log(file, file.text());
-        list.push({
-          name: directory[0],
-          handle: directory[1],
-          config: JSON.parse(await file.text()),
-        });
+    
+    try {
+      for await (const directory of handle) {
+        if (whiteNameList.includes(directory[0])) continue;
+  
+        if (directory[1].kind === "directory") {
+          const children = await handleIPDirectory(directory[1].entries())
+          list.push({
+            name: directory[0],
+            children,
+          });
+        } else {
+          console.log("file", directory);
+  
+          const file = await directory[1].getFile();
+          console.log(file, file.text());
+          list.push({
+            name: directory[0],
+            handle: directory[1],
+            config: JSON.parse(await file.text()),
+          });
+        }
       }
+    } catch (error) {
+      console.log('error', error);
     }
 
     return list;

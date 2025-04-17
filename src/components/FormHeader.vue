@@ -21,7 +21,7 @@ const props = defineProps<{
   choseIpDirectory: boolean,
 }>()
 
-const emits = defineEmits(['update:imgType', 'update:findText', 'update:choseDirectory', 'update:choseIpDirectory']);
+const emits = defineEmits(['update:imgType', 'update:showIndex', 'update:findText', 'update:choseDirectory', 'update:choseIpDirectory']);
 
 const imgTypeOptions: ComputedRef<DefaultOptionType[]> = computed(() => {
   return Array.from(props.imgTypeSet).map(item => ({ value: item, label: item }));
@@ -43,8 +43,8 @@ const changeImgType = (e: SelectValue) => {
  *
  * @param e 事件对象
  */
-const changeTextFn = (e: Event) => {
-  emits('update:findText', (e.target as HTMLInputElement).value);
+const changeInputFn = (type: string, e: Event) => {
+  emits(`update:${type}` as 'update:findText', type === 'showIndex' ? Number((e.target as HTMLInputElement).value) : (e.target as HTMLInputElement).value);
 };
 
 const changeCkeckFn = (type: 'choseDirectory' | 'choseIpDirectory', e: CheckboxChangeEvent) => {
@@ -65,29 +65,35 @@ const changeCkeckFn = (type: 'choseDirectory' | 'choseIpDirectory', e: CheckboxC
     <div class="header-tool">
       <a-button type="primary"
         @click="openDirectory">选取文件夹</a-button>
-      <a-input style="width: 210px"
+        <a-input style="width: 210px"
         :value="findText"
         addon-before="图片格式"
         placeholder="请输入关键词"
-        @input="changeTextFn" />
-      <span>图片类型：</span>
+        @input.stop="($event) => changeInputFn('findText', $event)" />
+      <a-input style="width: 210px"
+        :value="showIndex"
+        addon-before="当前索引"
+        placeholder="请输入跳转索引"
+        number
+        @input.stop="($event) => changeInputFn('showIndex', $event)" />
+      <span style="width: 55px;">类型：</span>
       <a-select :value="imgType"
         style="width: 160px"
         :options="imgTypeOptions"
-        @change="changeImgType" />
-      <a-button @click="openIPDirectory">关联IP</a-button>
-      <a-button @click="clearDownloadDirFn">重新指定保存路径</a-button>
-      <a-button @click="downloadImgFn">下载图片</a-button>
+        @change.stop="changeImgType" />
+      <a-button @click.stop="openIPDirectory">关联IP</a-button>
+      <a-button @click.stop="clearDownloadDirFn">重新指定保存路径</a-button>
+      <a-button @click.stop="downloadImgFn">下载图片</a-button>
     </div>
     <div class="header-download">
       <div class="download-chose">
         <checkbox :value:checked="choseDirectory"
-          @change="($event) => changeCkeckFn('choseDirectory', $event)">是否保存到指定路径</checkbox>
+          @change.stop="($event) => changeCkeckFn('choseDirectory', $event)">是否保存到指定路径</checkbox>
         <checkbox :value:checked="choseIpDirectory"
-          @change="($event) => changeCkeckFn('choseIpDirectory', $event)">是否携带ip目录</checkbox>
+          @change.stop="($event) => changeCkeckFn('choseIpDirectory', $event)">是否携带ip目录</checkbox>
       </div>
       <div class="total">
-        <a-button type="link" @click="statisticsTotalFn">统计结果</a-button>
+        <a-button type="link" @click.stop="statisticsTotalFn">统计结果</a-button>
       </div>
     </div>
   </header>

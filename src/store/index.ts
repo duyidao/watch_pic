@@ -12,7 +12,7 @@ export default () => {
 
   const imgTypeSet = ref<Set<string>>(new Set()); // 图片类型集合
 
-  const { ipFileList, findDeviceIp } = ipFile();
+  const { findDeviceIp } = ipFile();
 
   /**
    * 文件类型过滤器函数
