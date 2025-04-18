@@ -14,6 +14,7 @@ const {
   prevImgFn, nextImgFn, openDirectory, downloadImgFn, clearDownloadDirFn,
 } = file();
 const {
+  ipFileList,
   openIPDirectory,
 } = ipFile();
 const {
@@ -68,6 +69,7 @@ const totalList = computed(() => {
       v-model:choseDirectory="choseDirectory" v-model:choseIpDirectory="choseIpDirectory"
       :imgTypeSet="imgTypeSet" :imgInfo="imgInfo"
       :totalLength="imgList.length"
+      :ipFileList="ipFileList"
       :openDirectory="openDirectory"
       :downloadImgFn="downloadImgFn"
       :clearDownloadDirFn="clearDownloadDirFn"

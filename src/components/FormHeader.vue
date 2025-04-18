@@ -19,6 +19,7 @@ const props = defineProps<{
   imgInfo: ImgInfo,
   choseDirectory: boolean,
   choseIpDirectory: boolean,
+  ipFileList: object,
 }>()
 
 const emits = defineEmits(['update:imgType', 'update:showIndex', 'update:findText', 'update:choseDirectory', 'update:choseIpDirectory']);
@@ -69,31 +70,31 @@ const changeCkeckFn = (type: 'choseDirectory' | 'choseIpDirectory', e: CheckboxC
         :value="findText"
         addon-before="图片格式"
         placeholder="请输入关键词"
-        @input.stop="($event) => changeInputFn('findText', $event)" />
+        @input="($event) => changeInputFn('findText', $event)" />
       <a-input style="width: 210px"
         :value="showIndex"
         addon-before="当前索引"
         placeholder="请输入跳转索引"
         number
-        @input.stop="($event) => changeInputFn('showIndex', $event)" />
+        @input="($event) => changeInputFn('showIndex', $event)" />
       <span style="width: 55px;">类型：</span>
       <a-select :value="imgType"
         style="width: 160px"
         :options="imgTypeOptions"
-        @change.stop="changeImgType" />
-      <a-button @click.stop="openIPDirectory">关联IP</a-button>
-      <a-button @click.stop="clearDownloadDirFn">重新指定保存路径</a-button>
-      <a-button @click.stop="downloadImgFn">下载图片</a-button>
+        @change="changeImgType" />
+      <a-button @click="openIPDirectory">关联IP</a-button>
+      <a-button @click="clearDownloadDirFn">重新指定保存路径</a-button>
+      <a-button @click="downloadImgFn">下载图片</a-button>
     </div>
     <div class="header-download">
       <div class="download-chose">
         <checkbox :value:checked="choseDirectory"
-          @change.stop="($event) => changeCkeckFn('choseDirectory', $event)">是否保存到指定路径</checkbox>
-        <checkbox :value:checked="choseIpDirectory"
-          @change.stop="($event) => changeCkeckFn('choseIpDirectory', $event)">是否携带ip目录</checkbox>
+          @change="($event) => changeCkeckFn('choseDirectory', $event)">是否保存到指定路径</checkbox>
+        <checkbox v-if="JSON.stringify(ipFileList) !== '{}'" :value:checked="choseIpDirectory"
+          @change="($event) => changeCkeckFn('choseIpDirectory', $event)">是否携带ip目录</checkbox>
       </div>
       <div class="total">
-        <a-button type="link" @click.stop="statisticsTotalFn">统计结果</a-button>
+        <a-button type="link" @click="statisticsTotalFn">统计结果</a-button>
       </div>
     </div>
   </header>

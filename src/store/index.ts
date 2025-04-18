@@ -3,6 +3,7 @@ import { extractChinese } from "@/utils/index";
 import ipFile from "@/store/ip.ts";
 import type { FileItem, ImgInfo } from "@/types/index";
 import { message } from "ant-design-vue";
+const { findDeviceIp } = ipFile();
 
 const whiteNameList = [".DS_Store"]; // 白名单，不显示这些文件和目录
 const imgTypeList = [".jpg", ".jpeg", ".png", ".webp", ".svg"];
@@ -12,7 +13,6 @@ export default () => {
 
   const imgTypeSet = ref<Set<string>>(new Set()); // 图片类型集合
 
-  const { findDeviceIp } = ipFile();
 
   /**
    * 文件类型过滤器函数
@@ -174,6 +174,8 @@ export default () => {
 
   const handle: any = ref(null);
   const dir: any = ref(null);
+  const ipDir: any = ref(null);
+  const deviceIdDir: any = ref(null);
   const downloadImgList = ref<any[]>([]);
   /**
    * 获取用户选择的下载目录路径
@@ -209,21 +211,22 @@ export default () => {
         ];
       if (choseIpDirectory.value) {
         // ip文件夹
-        dir.value = await dir.value.getDirectoryHandle(parentName, {
+        ipDir.value = await dir.value.getDirectoryHandle(parentName, {
           create: true,
         });
         const deviceId = imgInfo.value.name.split("_")[1];
         const ip = findDeviceIp(parentName, deviceId);
         if (deviceId && ip) {
           // deviceId-ip文件夹
-          dir.value = await dir.getDirectoryHandle(`${deviceId}-${ip}`, {
+          deviceIdDir.value = await ipDir.value.getDirectoryHandle(`${deviceId}-${ip}`, {
             create: true,
           });
         }
       }
 
+      const downloadDir = deviceIdDir.value || ipDir.value || dir.value;
       downloadImgList.value.forEach(async (item: any) => {
-        const fileHandle = await dir.value!.getFileHandle(item.name, {
+        const fileHandle = await downloadDir!.getFileHandle(item.name, {
           create: true,
         });
         const writable = await fileHandle.createWritable();
@@ -233,8 +236,7 @@ export default () => {
         await writable.close();
       });
     } catch (err) {
-      console.error("用户取消或发生错误:", err);
-      message.success(`用户取消或发生错误:${err}`);
+      message.error(`用户取消或发生错误:${err}`);
     }
   };
   function fileAndBlobToArrayBuffer(file: File) {

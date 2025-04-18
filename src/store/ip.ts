@@ -5,6 +5,10 @@ const whiteNameList = [".DS_Store"]; // 白名单，不显示这些文件和目�
 export default () => {
   const ipFileList = ref<any>({}); // 完整ip目录数据
 
+  if (localStorage.getItem("ipFileList")) {
+    ipFileList.value = JSON.parse(localStorage.getItem("ipFileList")!);
+  }
+
   const handleIPDirectory: any = async (handle: any) => {
     const list = []; // 存放目录数据的数组
     
@@ -19,10 +23,7 @@ export default () => {
             children,
           });
         } else {
-          console.log("file", directory);
-  
           const file = await directory[1].getFile();
-          console.log(file, file.text());
           list.push({
             name: directory[0],
             handle: directory[1],
@@ -43,13 +44,13 @@ export default () => {
    * @returns 无返回值
    */
   const openIPDirectory = async () => {
+    ipFileList.value = {};
     const directorys = await (window as any).showDirectoryPicker();
-    console.log(directorys);
+    console.log('------------------------', directorys);
     
     const code = await handleIPDirectory(directorys.entries());
 
     ipFileList.value = code.reduce((acc: any, item: any) => {
-      // console.log(acc, item);
       acc[item.name] = item.children[0]?.config;
       return acc;
     }, {});
