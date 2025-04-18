@@ -5,7 +5,7 @@ const whiteNameList = [".DS_Store"]; // 白名单，不显示这些文件和目�
 export default () => {
   const totalData = ref<any>({}); // 完整ip目录数据
   const showModal = ref<boolean>(false); // 是否显示弹窗
-  const imgSearchList = ['施工区域', '火焰烟雾', '道路遗撒', 'roi偏移', '异常停车', '道路遗撒', '占用应急车道', '交通事故', '交通拥堵'];
+  const imgSearchList = ['施工区域', '火焰烟雾', '道路遗撒', 'roi偏移', '占用应急车道', '交通事故', '交通拥堵', '异常停车', '行人闯入', '养护施工', '非机动车道闯入', '车辆逆行', '货车占用主车道'];
 
   const handleIPDirectory: any = async (
     handle: any,
