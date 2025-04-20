@@ -1,18 +1,21 @@
 <script setup lang="ts">
 import { onMounted, computed } from 'vue';
-import file from '@/store/index.ts';
+import file from '@/store/file.ts';
 import ipFile from '@/store/ip.ts';
+import filterFile from '@/store/filter.ts';
 import statisticsFile from '@/store/statistics.ts';
 import ShowImg from '@comp/ShowImg.vue';
 import FormHeader from '@comp/FormHeader.vue';
 import ShowModal from '@comp/ShowModal.vue';
+import { imgTypeSet } from "@/store/common.ts";
 
 const {
-  imgList, showIndex, imgTypeSet,
-  imgType, findText, imgInfo,
-  choseDirectory, choseIpDirectory,
-  prevImgFn, nextImgFn, openDirectory, downloadImgFn, clearDownloadDirFn,
+  imgType, choseDirectory, choseIpDirectory, openDirectory, downloadImgFn, clearDownloadDirFn,
 } = file();
+const {
+  imgList, showIndex, findText, imgInfo,
+  prevImgFn, nextImgFn,
+} = filterFile();
 const {
   ipFileList,
   openIPDirectory,
