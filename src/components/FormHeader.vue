@@ -34,7 +34,6 @@ const imgTypeOptions: ComputedRef<DefaultOptionType[]> = computed(() => {
  * @param e 事件对象
  */
 const changeImgType = (e: SelectValue) => {
-  console.log(e);
   emits('update:imgType', e);
 };
 
@@ -49,7 +48,6 @@ const changeInputFn = (type: string, e: Event) => {
 };
 
 const changeCkeckFn = (type: 'choseDirectory' | 'choseIpDirectory', e: CheckboxChangeEvent) => {
-  console.log(type, e);
   emits(`update:${type}`, (e.target as HTMLInputElement).checked);
 };
 </script>
@@ -66,7 +64,7 @@ const changeCkeckFn = (type: 'choseDirectory' | 'choseIpDirectory', e: CheckboxC
     <div class="header-tool">
       <a-button type="primary"
         @click="openDirectory">选取文件夹</a-button>
-        <a-input style="width: 210px"
+      <a-input style="width: 210px"
         :value="findText"
         addon-before="图片格式"
         placeholder="请输入关键词"
@@ -90,11 +88,13 @@ const changeCkeckFn = (type: 'choseDirectory' | 'choseIpDirectory', e: CheckboxC
       <div class="download-chose">
         <checkbox :value:checked="choseDirectory"
           @change="($event) => changeCkeckFn('choseDirectory', $event)">是否保存到指定路径</checkbox>
-        <checkbox v-if="JSON.stringify(ipFileList) !== '{}'" :value:checked="choseIpDirectory"
+        <checkbox v-if="JSON.stringify(ipFileList) !== '{}'"
+          :value:checked="choseIpDirectory"
           @change="($event) => changeCkeckFn('choseIpDirectory', $event)">是否携带ip目录</checkbox>
       </div>
       <div class="total">
-        <a-button type="link" @click="statisticsTotalFn">统计结果</a-button>
+        <a-button type="link"
+          @click="statisticsTotalFn">统计结果</a-button>
       </div>
     </div>
   </header>
