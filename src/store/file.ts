@@ -28,8 +28,10 @@ export default () => {
     findText.value = '';
     imgType.value = '';
     showIndex.value = 0;
+    message.loading({ content: '正在加载中...', key: 'openDirectory', duration: 0 });
     const directorys = await (window as any).showDirectoryPicker();
     fileList.value = await handleDirectory(directorys.entries());
+    message.success({ content: '加载完成', key: 'openDirectory', duration: 2 });
   }
 
   const choseDirectory = ref<boolean>(false); // 是否选择了目录
@@ -111,7 +113,7 @@ export default () => {
           imgInfo.value.parentName.split(",").length - 1
         ];
       // ip文件夹
-      choseIpDirectory.value && createDirectory.ipDir(parentName);
+      choseIpDirectory.value && (await createDirectory.ipDir(parentName));
 
       const downloadDir = deviceIdDir.value || ipDir.value || dir.value;
 
@@ -122,11 +124,11 @@ export default () => {
         const writable = await fileHandle.createWritable();
         const buffer = await fileAndBlobToArrayBuffer(item.file!);
         await writable.write(buffer);
-        message.success(`图片${item.name}下载成功`);
         await writable.close();
       });
-    } catch (err) {
-      message.error(`用户取消或发生错误:${err}`);
+      message.success(`图片${downloadImgList.value[0].name.split(".")[0]}下载成功`);
+      } catch (err) {
+      message.error(`图片下载发生错误：${err}`);
     }
   };
 
