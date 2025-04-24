@@ -55,7 +55,6 @@ const changeCkeckFn = (type: 'choseDirectory' | 'choseIpDirectory', e: CheckboxC
 <template>
   <header>
     <div class="header-total">
-      <span class="img-index">第{{ showIndex + 1 }}张 / 共{{ totalLength }}张</span>
       <span class="img-name"
         :text="imgInfo.name">
         名称：{{ imgInfo.name }}
@@ -86,6 +85,7 @@ const changeCkeckFn = (type: 'choseDirectory' | 'choseIpDirectory', e: CheckboxC
     </div>
     <div class="header-download">
       <div class="download-chose">
+        <span class="img-index">第{{ showIndex + 1 }}张 / 共{{ totalLength }}张</span>
         <checkbox :value:checked="choseDirectory"
           @change="($event) => changeCkeckFn('choseDirectory', $event)">是否保存到指定路径</checkbox>
         <checkbox v-if="JSON.stringify(ipFileList) !== '{}'"
@@ -110,27 +110,8 @@ header {
     height: 25px;
     font-size: 20px;
 
-    .img-index {
-      position: relative;
-      max-width: 180px;
-      height: 100%;
-      margin-right: 10px;
-      padding-right: 13px;
-
-      &::after {
-        content: '';
-        display: block;
-        position: absolute;
-        right: 0px;
-        top: -2px;
-        width: 2px;
-        height: 25px;
-        background-color: #555;
-      }
-    }
-
     .img-name {
-      max-width: 84%;
+      width: 100%;
       height: 100%;
       white-space: nowrap;
       /*禁止文本换行 */
@@ -191,6 +172,16 @@ header {
     display: flex;
     align-items: center;
     justify-content: space-between;
+
+    .img-index {
+      position: relative;
+      max-width: 180px;
+      height: 100%;
+      margin-right: 10px;
+      padding-right: 13px;
+      font-size: 14px;
+      font-weight: 900;
+    }
 
     >div {
       display: flex;
