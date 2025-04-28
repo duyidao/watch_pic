@@ -5,7 +5,7 @@
 - 环境：Node.js：22.13.0；pnpm：8.11.0；npm：10.9.2；vite：4.5.0
 - 依赖：ant-design-vue: 4；less：4.2.2；less-loader：12.2.0
 
-拉取项目后 pnpm i 安装依赖，pnpm dev 运行项目。
+拉取项目后 `pnpm i` 安装依赖，`pnpm dev` 运行项目。
 
 ## 项目使用
 
@@ -21,3 +21,7 @@
 ## 项目交流
 
 如果在使用体验中遇到bug或有改进的建议，欢迎提PR，或者联系我。B站[账号](https://space.bilibili.com/383875686?spm_id_from=333.1007.0.0)；抖音账号:1658326369。
+
+## 思维导图
+
+![思维导图](https://pic1.imgdb.cn/item/680f8a3658cb8da5c8d26725.png)

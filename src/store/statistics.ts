@@ -19,7 +19,12 @@ export default () => {
     "车辆逆行",
     "货车占用主车道",
     "非机动车道闯入",
+    "非机动车闯入",
     "变道",
+    "车辆变道",
+    "堵车",
+    "起火",
+    "违停",
   ];
 
   const handleIPDirectory: any = async (
