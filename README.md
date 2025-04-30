@@ -1,5 +1,9 @@
 # 刀刀图片分类在线项目
 
+## 在线体验
+
+[刀刀图片分类在线项目](https://duyidao.github.io/watch-pic)
+
 ## 项目配置
 
 - 环境：Node.js：22.13.0；pnpm：8.11.0；npm：10.9.2；vite：4.5.0
