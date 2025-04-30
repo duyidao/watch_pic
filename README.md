@@ -28,7 +28,7 @@
 
 ## 思维导图
 
-![思维导图](/daotu.png)
+![思维导图](https://pic1.imgdb.cn/item/680f8a3658cb8da5c8d26725.png)
 
 ## 试用
 
