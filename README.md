@@ -2,7 +2,7 @@
 
 ## 在线体验
 
-[刀刀图片分类在线项目](https://duyidao.github.io/watch-pic)
+[刀刀图片分类在线项目](https://duyidao.github.io/watch_pic)
 
 ## 项目配置
 
@@ -28,7 +28,7 @@
 
 ## 思维导图
 
-![思维导图](https://pic1.imgdb.cn/item/680f8a3658cb8da5c8d26725.png)
+![思维导图](/daotu.png)
 
 ## 试用
 
